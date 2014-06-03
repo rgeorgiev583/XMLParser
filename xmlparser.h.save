@@ -1,0 +1,11 @@
+#include <vector>
+#include <stack>
+#include <sstream>
+#include "xmldom.h"
+#pragma once
+
+XMLElement parseXMLElement(string xml)
+{
+    stringstream ssxml(xml);
+    
+}
