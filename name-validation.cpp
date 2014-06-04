@@ -1,3 +1,11 @@
+/*
+ * name-validation.cpp
+ *
+ *  Created on: 03.06.2014
+ *      Author: radoslav
+ */
+
+#include <cwchar>
 #include "name-validation.h"
 
 bool isBaseChar(char ch)
@@ -194,7 +202,7 @@ bool isNameChar(wchar_t ch)
            isCombiningChar(ch) || isExtender(ch);
 }
 
-bool isValidName(string s)
+bool isValidName(std::string s)
 {
     size_t i = 1, slen = s.size();
 
@@ -204,7 +212,7 @@ bool isValidName(string s)
     return (isLetter(s[0]) || s[0] == '_') && i == slen;
 }
 
-bool isValidName(wstring s)
+bool isValidName(std::wstring s)
 {
     size_t i = 1, slen = s.size();
 
@@ -212,4 +220,26 @@ bool isValidName(wstring s)
         i++;
 
     return (isLetter(s[0]) || s[0] == '_') && i == slen;
+}
+
+std::string getDelimiterChars()
+{
+	std::string chars;
+
+	for (char i = 0; i <= 255; i++)
+		if (!isNameChar(i))
+			chars += i;
+
+	return chars;
+}
+
+std::wstring getDelimiterWchars()
+{
+	std::wstring chars;
+
+	for (wchar_t i = WCHAR_MIN; i <= WCHAR_MAX; i++)
+		if (!isNameChar(i))
+			chars += i;
+
+	return chars;
 }

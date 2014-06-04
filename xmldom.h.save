@@ -5,56 +5,56 @@
 #include ""
 #pragma once
 
-typedef std::wstring String;
-typedef std::map<String, String> XMLAttributeMap;
+typedef std::wstring XMLString;
+typedef std::map<XMLString, XMLString> XMLAttributeMap;
 
 class XMLNode
 {
 protected:
-    String name, value;
+    XMLString name, value;
 
 public:
-    XMLNode(const String& = String(), const String& = String());
+    XMLNode(const XMLString& = XMLString(), const XMLString& = XMLString());
 
-    String getName() const;
-    String getValue() const;
+    XMLString getName() const;
+    XMLString getValue() const;
 
-    void setValue(const String&);
+    void setValue(const XMLString&);
 };
 
 class XMLElement: public XMLNode
 {
 protected:
-    String ns;
+    XMLString ns;
     XMLAttributeMap attributes;
     PointerList<XMLElement> children;
     //XMLElement* parent;
 
 public:
-    XMLElement(const String&, bool);
+    XMLElement(const XMLString&, bool);
     XMLElement(std::istream& = std::cin); // ASCII
     XMLElement(std::wistream& = std::wcin); // Unicode
-    XMLElement(const String& = String(), const String& = String(), const String& = String());
-    //XMLElement(const String&, const String&, const String&, const map<String, String>&, const list<XMLElement*>&);
+    XMLElement(const XMLString& = XMLString(), const XMLString& = XMLString(), const XMLString& = XMLString());
+    //XMLElement(const XMLString&, const XMLString&, const XMLString&, const map<XMLString, XMLString>&, const list<XMLElement*>&);
 
-    String getNamespace() const;
-    String getText() const;
-    bool doesAttributeExist(const String&) const;
+    XMLString getNamespace() const;
+    XMLString getText() const;
+    bool doesAttributeExist(const XMLString&) const;
     size_t getChildrenCount() const;
 
-    String& getAttribute(const String&);
-    String& operator[](const String&);
+    XMLString& getAttribute(const XMLString&);
+    XMLString& operator[](const XMLString&);
     XMLElement& getChild(size_t);
     XMLElement& operator[](size_t);
 
-    void setText(const String&);
-    void addAttribute(const String&, const String&);
-    bool removeAttribute(const String&);
+    void setText(const XMLString&);
+    void addAttribute(const XMLString&, const XMLString&);
+    bool removeAttribute(const XMLString&);
     void addChild(size_t, const XMLElement&);
     void appendChild(const XMLElement&);
     void removeChild(size_t);
 
-    ///PointerList<XMLNode> queryXPath(const String&);
+    ///PointerList<XMLNode> queryXPath(const XMLString&);
 
     ///friend ostream& operator<<(ostream&, const XMLElement&);
 };

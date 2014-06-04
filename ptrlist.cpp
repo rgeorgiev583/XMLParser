@@ -1,5 +1,15 @@
+/*
+ * ptrlist.cpp
+ *
+ *  Created on: 03.06.2014
+ *      Author: radoslav
+ */
+
+#ifndef PTRLIST_CPP_
+#define PTRLIST_CPP_
+
 #include "ptrlist.h"
-#pragma once
+
 /*
 template<typename T>
 PointerList<T>::PointerList(size_t n, const T& val = T()): std::list<T*>(n, &val) {}
@@ -7,6 +17,7 @@ PointerList<T>::PointerList(size_t n, const T& val = T()): std::list<T*>(n, &val
 template<typename T>
 PointerList<T>::PointerList(const PointerListIterator& first, const PointerListIterator& last): std::list<T*>(first, last) {}
 */
+
 template<typename T>
 PointerListConstIterator<T> PointerList<T>::begin() const
 {
@@ -149,3 +160,5 @@ const T& PointerListConstIterator<T>::operator*() const
 {
     return *std::list<T*>::const_iterator::operator*();
 }
+
+#endif /* PTRLIST_CPP_ */

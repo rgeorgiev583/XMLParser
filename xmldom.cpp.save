@@ -4,31 +4,31 @@
 
 typedef PointerListIterator<XMLElement> XMLElementListIterator;
 
-XMLNode::XMLNode(const String& _name, const String& _value): name(_name), value(_value) {}
+XMLNode::XMLNode(const XMLString& _name, const XMLString& _value): name(_name), value(_value) {}
 
-String XMLNode::getName() const
+XMLString XMLNode::getName() const
 {
     return name;
 }
 
-String XMLNode::getValue() const
+XMLString XMLNode::getValue() const
 {
     return value;
 }
 
-void XMLNode::setValue(const String& _value)
+void XMLNode::setValue(const XMLString& _value)
 {
     value = _value;
 }
 
-XMLElement::XMLElement(const String& xml, bool)
+XMLElement::XMLElement(const XMLString& xml, bool)
 {
     xml.find("");
     
 }
 
 /*
-XMLElement::XMLElement(const String& xml, bool)
+XMLElement::XMLElement(const XMLString& xml, bool)
 {
     XMLElementParser parser(xml);
     name = parser.getName();
@@ -54,7 +54,7 @@ XMLElement::XMLElement(std::istream& is = std::cin)
 
 XMLElement::XMLElement(std::wistream& is = std::wcin)
 {
-    String xml, line;
+    XMLString xml, line;
 
     while (std::getline(is, line))
     {
@@ -65,19 +65,19 @@ XMLElement::XMLElement(std::wistream& is = std::wcin)
     XMLElement(xml, true);
 }
 */
-XMLElement::XMLElement(const String& _name, const String& text, const String& _ns): XMLNode(_name, text), ns(_ns) {}
+XMLElement::XMLElement(const XMLString& _name, const XMLString& text, const XMLString& _ns): XMLNode(_name, text), ns(_ns) {}
 
-String XMLElement::getNamespace() const
+XMLString XMLElement::getNamespace() const
 {
     return ns;
 }
 
-String XMLElement::getText() const
+XMLString XMLElement::getText() const
 {
     return value;
 }
 
-bool XMLElement::doesAttributeExist(const String& attrname) const
+bool XMLElement::doesAttributeExist(const XMLString& attrname) const
 {
     return attributes.find(attrname) != attributes.end();
 }
@@ -87,12 +87,12 @@ size_t XMLElement::getChildrenCount() const
     return children.size();
 }
 
-String& XMLElement::getAttribute(const String& attrname)
+XMLString& XMLElement::getAttribute(const XMLString& attrname)
 {
     return doesAttributeExist(attrname) ? attributes[attrname] : attributes.begin()->second;
 }
 
-String& XMLElement::operator[](const String& attrname)
+XMLString& XMLElement::operator[](const XMLString& attrname)
 {
     return getAttribute(attrname);
 }
@@ -113,17 +113,17 @@ XMLElement& XMLElement::operator[](size_t pos)
     return getChild(pos);
 }
 
-void XMLElement::setText(const String& text)
+void XMLElement::setText(const XMLString& text)
 {
     value = text;
 }
 
-void XMLElement::addAttribute(const String& name, const String& value)
+void XMLElement::addAttribute(const XMLString& name, const XMLString& value)
 {
     attributes[name] = value;
 }
 
-bool XMLElement::removeAttribute(const String& name)
+bool XMLElement::removeAttribute(const XMLString& name)
 {
     return attributes.erase(name);
 }

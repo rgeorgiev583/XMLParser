@@ -1,5 +1,14 @@
+/*
+ * ptrlist.h
+ *
+ *  Created on: 03.06.2014
+ *      Author: radoslav
+ */
+
+#ifndef PTRLIST_H_
+#define PTRLIST_H_
+
 #include <list>
-#pragma once
 
 template<typename T>
 class PointerListIterator: public std::list<T*>::iterator
@@ -24,9 +33,11 @@ public:
 };
 
 template<typename T>
-class PointerListReverseIterator: public std::reverse_iterator<PointerListIterator<T> > {};
+class PointerListReverseIterator:
+		public std::reverse_iterator<PointerListIterator<T> > {};
 template<typename T>
-class PointerListReverseConstIterator: public std::reverse_iterator<PointerListConstIterator<T> > {};
+class PointerListReverseConstIterator:
+		public std::reverse_iterator<PointerListConstIterator<T> > {};
 
 template<typename T>
 class PointerList: public std::list<T*>
@@ -59,11 +70,15 @@ public:
     PointerListIterator<T> insert(const PointerListIterator<T>&, const T&);
     /*
     void insert(const PointerListIterator<T>&, size_t, const T&);
-    void insert(const PointerListIterator<T>&, const PointerListIterator<T>&, const PointerListIterator<T>&);
+    void insert(const PointerListIterator<T>&, const PointerListIterator<T>&,
+    		const PointerListIterator<T>&);
     */
     PointerListIterator<T> erase(const PointerListIterator<T>&);
     /*
-    PointerListIterator<T> erase(const PointerListIterator<T>&, const PointerListIterator<T>&);
+    PointerListIterator<T> erase(const PointerListIterator<T>&,
+    		const PointerListIterator<T>&);
     void resize(size_t, T = T());
     */
 };
+
+#endif /* PTRLIST_H_ */

@@ -1,5 +1,14 @@
+/*
+ * name-validation.h
+ *
+ *  Created on: 03.06.2014
+ *      Author: radoslav
+ */
+
+#ifndef NAME_VALIDATION_H_
+#define NAME_VALIDATION_H_
+
 #include <string>
-#pragma once
 
 bool isBaseChar(char);
 bool isBaseChar(wchar_t);
@@ -15,5 +24,10 @@ bool isLetter(wchar_t);
 bool isNameChar(char);
 bool isNameChar(wchar_t);
 
-bool isValidName(string);
-bool isValidName(wstring);
+bool isValidName(std::string);
+bool isValidName(std::wstring);
+
+std::string getDelimiterChars();
+std::wstring getDelimiterWchars();
+
+#endif /* NAME_VALIDATION_H_ */
