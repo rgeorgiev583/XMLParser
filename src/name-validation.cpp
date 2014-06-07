@@ -6,7 +6,7 @@
  */
 
 #include <cwchar>
-#include "name-validation.h"
+#include "../headers/name-validation.h"
 
 bool isBaseChar(char ch)
 {

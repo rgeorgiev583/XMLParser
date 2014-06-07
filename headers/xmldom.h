@@ -12,9 +12,9 @@
 #include <map>
 #include <iostream>
 
-#include "ptrlist.cpp"
+//#include "ptrlist.cpp"
+#include "xmlstring.h"
 
-typedef std::wstring XMLString;
 typedef std::map<XMLString, XMLString> XMLAttributeMap;
 
 class XMLNode
@@ -23,7 +23,7 @@ protected:
     XMLString name, value;
 
 public:
-    XMLNode(const XMLString& = XMLString(), const XMLString& = XMLString());
+    XMLNode(const XMLString&, const XMLString&);
 
     XMLString getName() const;
     XMLString getValue() const;
@@ -36,10 +36,10 @@ class XMLElement: public XMLNode
 protected:
     XMLString ns;
     XMLAttributeMap attributes;
-    PointerList<XMLElement> children;
+    std::list<XMLElement*> children;
     XMLElement* parent;
 
-    friend bool assignParsedXML(XMLElement*, const XMLString&);
+    friend bool assignParsedXML(const XMLString&, XMLElement*);
 
 public:
     XMLElement(const XMLString&, bool);
@@ -48,7 +48,7 @@ public:
     XMLElement(const XMLString& = XMLString(), const XMLString& = XMLString(),
     		const XMLString& = XMLString());
     //XMLElement(const XMLString&, const XMLString&, const XMLString&,
-    //		const map<XMLString, XMLString>&, const list<XMLElement*>&);
+    //		const XMLAttributeMap&, const std::list<XMLElement*>&, XMLElement*);
 
     XMLString getNamespace() const;
     XMLString getText() const;
@@ -68,9 +68,10 @@ public:
     void appendChild(const XMLElement&);
     void removeChild(size_t);
 
-    ///PointerList<XMLNode> queryXPath(const XMLString&);
+    ///std::list<XMLNode*> queryXPath(const XMLString&);
 
-    ///friend ostream& operator<<(ostream&, const XMLElement&);
+    //friend std::ostream& operator<<(std::ostream&, const XMLElement&);
+    friend std::wostream& operator<<(std::wostream&, const XMLElement&);
 };
 
 #endif /* XMLDOM_H_ */

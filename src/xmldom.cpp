@@ -5,17 +5,21 @@
  *      Author: radoslav
  */
 
+#ifndef XMLDOM_CPP_
+#define XMLDOM_CPP_
+
+#include "../headers/xmldom.h"
+
 #include <iostream>
-#include <stack>
-#include <vector>
-#include "xmldom.h"
-#include "tokenizer.h"
-#include "name-validation.h"
 
-typedef PointerListIterator<XMLElement> XMLElementListIterator;
+#include "../headers/tokenizer.h"
+#include "../headers/name-validation.h"
 
-XMLNode::XMLNode(const XMLString& _name, const XMLString& _value):
-		name(_name), value(_value) {}
+//typedef PointerListIterator<XMLElement> XMLElementListIterator;
+//typedef std::wstring XMLString;
+
+XMLNode::XMLNode(const XMLString& _name = XMLString(),
+		const XMLString& _value = XMLString()): name(_name), value(_value) {}
 
 XMLString XMLNode::getName() const
 {
@@ -36,14 +40,17 @@ bool assignParsedXML(const XMLString& xml, XMLElement* elem)
 {
 	// find closing `>' of opening tag and store its position
 	size_t endpos_otag_elem = xml.find(">");
-	if (endpos_otag_elem == std::string::npos)
+	if (endpos_otag_elem == XMLString::npos)
 		return false;
 	// retrieve opening tag of element
 	XMLString otag_elem = xml.substr(0, endpos_otag_elem + 1);
 	// create tokenizer for opening tag of element
 	Tokenizer tok_otag_elem(otag_elem);
 	// retrieve element name from tokenizer
-	elem->name = tok_otag_elem.getToken();
+	XMLString qname_elem = tok_otag_elem.getToken();
+	Tokenizer tok_qname_elem(qname_elem, ":");
+	elem->ns = tok_qname_elem.getToken();
+	elem->name = tok_qname_elem.getToken();
 
 	// for each attribute (`name=value' pair) in the elem element
 	while (tok_otag_elem.nextToken())
@@ -56,24 +63,25 @@ bool assignParsedXML(const XMLString& xml, XMLElement* elem)
 			   value_attr_elem = tok_attr_elem.getToken();
 		size_t value_attr_elem_length = value_attr_elem.length();
 		if (value_attr_elem[0] == '"' &&
-				value_attr_elem[value_attr_elem_length] == '"')
-			value_attr_elem = value_attr_elem.substr(1, value_attr_elem_length);
+				value_attr_elem[value_attr_elem_length - 1] == '"')
+			value_attr_elem = value_attr_elem.substr(1,
+					value_attr_elem_length - 1);
 		elem->attributes[name_attr_elem] = value_attr_elem;
 	}
 
 	size_t endpos_prevtag = endpos_otag_elem,
 			beginpos_nexttag = xml.find("<", endpos_prevtag);
-	while (beginpos_nexttag != std::string::npos &&
+	while (beginpos_nexttag != XMLString::npos &&
 		   beginpos_nexttag + 1 < xml.length())
 	{
 		// retrieve upper part of inner content (text) of element
-		elem->value += xml.substr(endpos_prevtag + 1, beginpos_nexttag -
-				endpos_prevtag - 1);
+		elem->value.std::wstring::append(xml.substr(endpos_prevtag + 1,
+				beginpos_nexttag - endpos_prevtag - 1));
 		if (xml[beginpos_nexttag + 1] != '/')
 		{
-			XMLElement* childelem = new XMLElement("");
+			XMLElement* childelem = new XMLElement();
 			childelem->parent = elem;
-			elem->children.push_back(*childelem);
+			elem->children.push_back(childelem);
 			if (!assignParsedXML(xml.substr(beginpos_nexttag), childelem))
 				return false;
 		}
@@ -92,33 +100,37 @@ XMLElement::XMLElement(const XMLString& xml, bool)
 	/* find the first occurence of `<' (de facto beginning of XML document)
 	 *  and the last  occurence of `>' (de facto end of XML document)
 	 **/
-	size_t beginpos_root = xml.find("<"), endpos_root = elem.rfind(">");
+	size_t beginpos_root = xml.find("<"), endpos_root = xml.rfind(">");
 	/*
 	 * reduce string to XML only (remove leading and trailing junk that is not
 	 * part of the XML document)
 	 **/
-	assignParsedXML(xml.substr(beginpos_root, endpos_root), this);
+	assignParsedXML(xml.substr(beginpos_root, endpos_root - beginpos_root + 1),
+			this);
 }
 
-XMLElement::XMLElement(std::istream& is)
+XMLElement::XMLElement(std::istream& is): parent(NULL)
 {
-    std::string xml, line;
+	XMLString xml;
+	std::string line;
 
-    while (std::getline(is, line))
+    while (!is.eof())
     {
+    	std::getline(is, line);
         xml += line;
         xml += '\n';
     }
 
-    XMLElement(std::wstring(xml.begin(), xml.end()), true);
+    XMLElement(xml, true);
 }
 
-XMLElement::XMLElement(std::wistream& is)
+XMLElement::XMLElement(std::wistream& is): parent(NULL)
 {
     XMLString xml, line;
 
-    while (std::getline(is, line))
+    while (!is.eof())
     {
+    	std::getline(is, line);
         xml += line;
         xml += '\n';
     }
@@ -127,7 +139,7 @@ XMLElement::XMLElement(std::wistream& is)
 }
 
 XMLElement::XMLElement(const XMLString& _name, const XMLString& text,
-		const XMLString& _ns): XMLNode(_name, text), ns(_ns) {}
+		const XMLString& _ns): XMLNode(_name, text), ns(_ns), parent(NULL) {}
 
 XMLString XMLElement::getNamespace() const
 {
@@ -162,14 +174,14 @@ XMLString& XMLElement::operator[](const XMLString& attrname)
 
 XMLElement& XMLElement::getChild(size_t pos)
 {
-    XMLElementListIterator ichild;
+	std::list<XMLElement*>::iterator ichild;
     size_t i = 0;
 
     for (ichild = children.begin(); ichild != children.end() && i < pos;
     		ichild++)
         i++;
 
-    return ichild != children.end() ? *ichild : children.back();
+    return ichild != children.end() ? **ichild : *children.back();
 }
 
 XMLElement& XMLElement::operator[](size_t pos)
@@ -194,24 +206,24 @@ bool XMLElement::removeAttribute(const XMLString& name)
 
 void XMLElement::addChild(size_t pos, const XMLElement& child)
 {
-    XMLElementListIterator ichild;
+	std::list<XMLElement*>::iterator ichild;
     size_t i = 0;
 
     for (ichild = children.begin(); ichild != children.end() && i < pos;
     		ichild++)
         i++;
 
-    children.insert(ichild, child);
+    children.insert(ichild, (XMLElement*) &child);
 }
 
 void XMLElement::appendChild(const XMLElement& child)
 {
-    children.push_back(child);
+    children.push_back((XMLElement*) &child);
 }
 
 void XMLElement::removeChild(size_t pos)
 {
-    XMLElementListIterator ichild;
+	std::list<XMLElement*>::iterator ichild;
     size_t i = 0;
 
     for (ichild = children.begin(); ichild != children.end() && i < pos;
@@ -220,3 +232,29 @@ void XMLElement::removeChild(size_t pos)
 
     children.erase(ichild);
 }
+
+std::wostream& operator<<(std::wostream& os, const XMLElement& elem)
+{
+	os << "XML element `" << elem.name << "'";
+	if (elem.parent)
+		os << ", child of `" << elem.parent->name << "'";
+	os << std::endl;
+	os << "Namespace: `" << elem.ns << "'" << std::endl;
+	os << "Text content:";
+	os << "------------------------" << std::endl;
+	os << elem.value << std::endl;
+	os << "------------------------" << std::endl;
+	os << "Attributes: " << std::endl;
+
+	for (XMLAttributeMap::const_iterator i = elem.attributes.begin();
+			i != elem.attributes.end(); i++)
+		os << "|-  " << i->first << " = `" << i->second << "'" << std::endl;
+
+	for (std::list<XMLElement*>::const_iterator i = elem.children.begin();
+			i != elem.children.end(); i++)
+		operator<<(os, **i);
+
+	return os;
+}
+
+#endif /* XMLDOM_CPP_ */
