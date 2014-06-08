@@ -12,16 +12,15 @@ using namespace std;
 
 int main()
 {
-	cout << "Fuck this shit!" << endl;
-	wcout << "Fuck this shit!" << endl;
-	std::ifstream f("/home/radoslav/projects/XMLParser/test.xml", std::ifstream::in);
+	cout_t << "Fuck this shit!" << endl;
+	ifstream_t f("/home/radoslav/projects/XMLParser/test.xml", ifstream_t::in);
 	if (!f.is_open())
 	{
 		cout << "ERROR: Cannot open file!" << endl;
 		return 1;
-    }
-	XMLElement elem(f);
-	wcout << elem;
-	wcout << "Hello world!" << endl;
+	}
+    XMLElement elem(f);
+	cout_t << elem;
+	cout_t << "Hello world!" << endl;
 	return 0;
 }

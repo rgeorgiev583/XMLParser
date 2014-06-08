@@ -10,68 +10,59 @@
 
 #include <list>
 #include <map>
-#include <iostream>
 
-//#include "ptrlist.cpp"
-#include "xmlstring.h"
+#include "unicode.h"
 
-typedef std::map<XMLString, XMLString> XMLAttributeMap;
+typedef std::map<string_t, string_t> XMLAttributeMap;
 
-class XMLNode
+struct XMLNode
 {
-protected:
-    XMLString name, value;
+    string_t name, value;
 
-public:
-    XMLNode(const XMLString&, const XMLString&);
-
-    XMLString getName() const;
-    XMLString getValue() const;
-
-    void setValue(const XMLString&);
+    XMLNode(const string_t&, const string_t&);
 };
 
 class XMLElement: public XMLNode
 {
-protected:
-    XMLString ns;
+//protected:
+    string_t ns;
     XMLAttributeMap attributes;
     std::list<XMLElement*> children;
     XMLElement* parent;
 
-    friend bool assignParsedXML(const XMLString&, XMLElement*);
-
+    friend size_t parseAndAssignXML(const string_t&, XMLElement*);
+    friend XMLElement* getPtrToParsedXML(const string_t&);
+    friend XMLElement parseXML(const string_t&);
+    void assignParsedXML(const string_t&);
 public:
-    XMLElement(const XMLString&, bool);
-    XMLElement(std::istream&); // ASCII
-    XMLElement(std::wistream&); // Unicode
-    XMLElement(const XMLString& = XMLString(), const XMLString& = XMLString(),
-    		const XMLString& = XMLString());
-    //XMLElement(const XMLString&, const XMLString&, const XMLString&,
+    XMLElement(const string_t&, bool);
+    XMLElement(istream_t&);
+    XMLElement(const string_t& = string_t(), const string_t& = string_t(),
+    		const string_t& = string_t());
+    //XMLElement(const string_t&, const string_t&, const string_t&,
     //		const XMLAttributeMap&, const std::list<XMLElement*>&, XMLElement*);
 
-    XMLString getNamespace() const;
-    XMLString getText() const;
-    bool doesAttributeExist(const XMLString&) const;
+    string_t getNamespace() const;
+    string_t getText() const;
+    bool doesAttributeExist(const string_t&) const;
     size_t getChildrenCount() const;
 
-    XMLString& getAttribute(const XMLString&);
-    XMLString& operator[](const XMLString&);
+    string_t& getAttribute(const string_t&);
+    string_t& operator[](const string_t&);
     XMLElement& getChild(size_t);
     XMLElement& getParent();
     XMLElement& operator[](size_t);
 
-    void setText(const XMLString&);
-    void addAttribute(const XMLString&, const XMLString&);
-    bool removeAttribute(const XMLString&);
+    void setText(const string_t&);
+    void addAttribute(const string_t&, const string_t&);
+    bool removeAttribute(const string_t&);
     void addChild(size_t, const XMLElement&);
     void appendChild(const XMLElement&);
     void removeChild(size_t);
 
-    ///std::list<XMLNode*> queryXPath(const XMLString&);
+    ///std::list<XMLNode*> queryXPath(const string_t&);
 
-    //friend std::ostream& operator<<(std::ostream&, const XMLElement&);
-    friend std::wostream& operator<<(std::wostream&, const XMLElement&);
+    friend ostream_t& operator<<(ostream_t&, const XMLElement&);
 };
 
 #endif /* XMLDOM_H_ */
